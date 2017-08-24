@@ -18,3 +18,9 @@ hello-arm
 hello-x64
 hello-x86
 hello.s
+tags
+GTAGS
+GPATH
+GRTAGS
+.mypy_cache/
+*.pyc
