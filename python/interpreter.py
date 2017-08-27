@@ -1,7 +1,7 @@
 #! /usr/bin/python
 # -*- coding: utf-8 -*-
 # vim:fenc=utf-8
-# Last modified: 2017-08-27 16:46:24
+# Last modified: 2017-08-27 17:08:46
 import sys
 
 
@@ -53,7 +53,7 @@ class Brainf_VirtualMachine(object):
         if self.stack[self.pointer] != 0:
             self.pc = self.bracket_map.get(self.pc)
 
-    def exec(self, program: list):
+    def program_exec(self, program):
         try:
             self.pc = 0
             self.bracket_map, self.program = self.parse(program)
@@ -96,7 +96,7 @@ def run(argv):
         program = f.read()
 
     vm = Brainf_VirtualMachine()
-    vm.exec(list(program))
+    vm.program_exec(list(program))
 
 
 if __name__ == "__main__":
