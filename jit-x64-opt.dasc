@@ -22,6 +22,19 @@
 #define Dst &state
 #define MAX_NESTING 256
 
+int continuous_count(char **p)
+{
+    char *ptr = *p;
+    int count = 0;
+    while (*ptr == **p) {
+        count++;
+        ptr++;
+    }
+    *p=ptr;
+    (*p)--;
+    return count;
+}
+
 int main(int argc, char *argv[])
 {
 	if (argc < 2) err("Usage: jit-x64 <inputfile>");
@@ -31,6 +44,7 @@ int main(int argc, char *argv[])
 	unsigned int maxpc = 0;
 	int pcstack[MAX_NESTING];
 	int *top = pcstack, *limit = pcstack + MAX_NESTING;
+    int value = 0;
 
 	// Function prologue.
 	|  push PTR
@@ -39,16 +53,20 @@ int main(int argc, char *argv[])
 	for (char *p = read_file(argv[1]); *p; p++) {
 		switch (*p) {
 		case '>':
-			|  inc  PTR
+			value = continuous_count(&p);
+			|  add  PTR,value
 			break;
 		case '<':
-			|  dec  PTR
+			value = continuous_count(&p);
+			|  add  PTR,-value
 			break;
 		case '+':
-			|  inc  byte [PTR]
+			value = continuous_count(&p);
+			|  add  byte [PTR],value
 			break;
 		case '-':
-			|  dec  byte [PTR]
+			value = continuous_count(&p);
+			|  add  byte [PTR],-value
 			break;
 		case '.':
 			|  movzx edi, byte [PTR]
