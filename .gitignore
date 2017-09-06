@@ -10,6 +10,8 @@ jit-x86
 jit-x86.h
 jit-x64
 jit-x64.h
+jit-x64-opt
+jit-x64-opt.h
 jit-arm
 jit-arm.h
 jit0-x64
