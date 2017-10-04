@@ -35,6 +35,31 @@ int continuous_count(char **p)
     return count;
 }
 
+/* scan loop [>] */
+int scan_loop(char** p ,char* mem){
+
+    char *ptr = *p;
+
+    ptr++;
+    if(*ptr != '>' || *ptr != '<' || *(ptr+1) != ']'){
+        return -1;
+    }
+
+    /* move right or move left */
+    if(*ptr == '<'){
+        /* scan left */
+        ptr -= (long)((void*)(mem + ptr) - memchr(mem , 0, *(ptr)+1));
+    }else{
+        /* scan right */
+        ptr += (long)(memchr(mem , 0, sizeof(mem))-(void*)(mem + ptr));
+    }
+
+	ptr++;
+	*p = ptr;
+    return 0;
+}
+
+
 int main(int argc, char *argv[])
 {
 	if (argc < 2) err("Usage: jit-x64 <inputfile>");
@@ -50,7 +75,9 @@ int main(int argc, char *argv[])
 	|  push PTR
 	|  mov  PTR, rdi      // rdi store 1st argument
 
-	for (char *p = read_file(argv[1]); *p; p++) {
+	char* base_mem = read_file(argv[1]);
+
+	for (char *p = base_mem; *p; p++) {
 		switch (*p) {
 		case '>':
 			value = continuous_count(&p);
@@ -81,6 +108,11 @@ int main(int argc, char *argv[])
 			// Each loop gets two pclabels: at the beginning and end.
 			// We store pclabel offsets in a stack to link the loop
 			// begin and end together.
+			int ret = scan_loop(&p, base_mem);
+
+			if (ret == 0)
+				break;
+
 			maxpc += 2;
 			*top++ = maxpc;
 			dasm_growpc(&state, maxpc);
